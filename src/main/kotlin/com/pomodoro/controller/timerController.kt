@@ -2,16 +2,23 @@ package com.pomodoro.controller
 
 import org.springframework.web.bind.annotation.*
 import com.pomodoro.service.TimerConfigService
+import java.util.*
+import kotlin.concurrent.schedule
 
 @RestController
 @RequestMapping("/timer")
 class TimerController(private val timerConfigService: TimerConfigService) {
-
+    private var workTimer: Timer? = null
+    private var breakTimer: Timer? = null
     @GetMapping("/start")
     fun startTimer(): String {
-        val workTime = timerConfigService.getWorkTime()
-        // Lógica para iniciar o temporizador Pomodoro com o tempo de trabalho configurado
-        return "Timer started with work time of $workTime minutes"
+        val workTime = timerConfigService.getWorkTime() * 60 * 1000 // Convertendo minutos para milissegundos
+        workTimer = Timer("WorkTimer", false)
+        workTimer?.schedule(workTime) {
+            // Lógica para quando o temporizador de trabalho terminar
+            println("Temporizador de trabalho encerrado")
+        }
+        return "Timer started with work time of ${timerConfigService.getWorkTime()} minutes"
     }
 
     @GetMapping("/pause")
