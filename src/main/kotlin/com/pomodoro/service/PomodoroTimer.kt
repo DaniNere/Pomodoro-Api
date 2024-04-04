@@ -1,9 +1,13 @@
 package com.pomodoro.service
+
+import java.util.*
 import java.util.concurrent.Executors
 import java.util.concurrent.ScheduledExecutorService
 import java.util.concurrent.TimeUnit
+import org.springframework.stereotype.Component
 
-class PomodoroTimer(private val callback: () -> Unit) {
+@Component
+class PomodoroTimer {
     private var remainingTimeSeconds: Long = 0
     private var timer: ScheduledExecutorService? = null
 
@@ -17,8 +21,14 @@ class PomodoroTimer(private val callback: () -> Unit) {
             TimeUnit.SECONDS
         )
     }
+
+    private var callback: (() -> Unit)? = null
+
+    fun setCallback(callback: () -> Unit) {
+        this.callback = callback
+    }
+
     fun onWorkTimerFinished() {
-        // Lógica para ser executada quando o temporizador de trabalho terminar
         println("Work timer finished")
     }
 
@@ -28,15 +38,18 @@ class PomodoroTimer(private val callback: () -> Unit) {
 
     private fun updateTimer() {
         remainingTimeSeconds--
+        val remainingMinutes = remainingTimeSeconds / 60
+        println("Remaining Time: $remainingMinutes minutes")
         if (remainingTimeSeconds <= 0) {
-            callback.invoke() // Notifica quando o temporizador chega a zero
+            callback?.invoke() // Notifica quando o temporizador chega a zero
             timer?.shutdown() // Encerra o temporizador
         }
     }
 }
 
 fun main() {
-    val pomodoroTimer = PomodoroTimer {
+    val pomodoroTimer = PomodoroTimer()
+    pomodoroTimer.setCallback {
         println("Tempo de trabalho concluído!")
     }
     pomodoroTimer.startTimer(25) // Inicia o temporizador com 25 minutos
