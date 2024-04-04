@@ -13,6 +13,7 @@ class TimerConfigService {
 
     fun setWorkTime(minutes: Long) {
         workTime = minutes
+
     }
 
     fun getBreakTime(): Long {

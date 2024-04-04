@@ -33,6 +33,7 @@ class TimerController(
     @PostMapping("/work-time/{minutes}")
     fun setWorkTime(@PathVariable minutes: Long): String {
         timerConfigService.setWorkTime(minutes)
+        pomodoroTimer.setWorkTime(minutes) // Atualiza o tempo de trabalho no PomodoroTimer
         return "Work time set to $minutes minutes"
     }
 

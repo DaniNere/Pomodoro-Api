@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component
 class PomodoroTimer {
     private var remainingTimeSeconds: Long = 0
     private var timer: ScheduledExecutorService? = null
+    private var workTime: Long = 25 // Tempo padrão de trabalho em minutos
 
     fun startTimer(minutes: Long) {
         remainingTimeSeconds = minutes * 60
@@ -44,6 +45,10 @@ class PomodoroTimer {
             callback?.invoke() // Notifica quando o temporizador chega a zero
             timer?.shutdown() // Encerra o temporizador
         }
+    }
+
+    fun setWorkTime(minutes: Long) {
+        workTime = minutes
     }
 }
 
