@@ -1,43 +1,35 @@
 package com.pomodoro.controller
 
 import com.pomodoro.service.PomodoroTimer
-import org.springframework.web.bind.annotation.*
 import com.pomodoro.service.TimerConfigService
-import java.util.*
-import kotlin.concurrent.schedule
+import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping("/timer")
+class TimerController(
+    private val timerConfigService: TimerConfigService,
+    private val pomodoroTimer: PomodoroTimer
+) {
 
-class TimerController(private val timerConfigService: TimerConfigService,
-                      private val pomodoroTimer: PomodoroTimer) {
-    private var workTimer: Timer? = null
-    private var breakTimer: Timer? = null
     @GetMapping("/start")
     fun startTimer(): String {
-        val workTime = timerConfigService.getWorkTime() * 60 * 1000 // Convertendo minutos para milissegundos
-        workTimer = Timer("WorkTimer", false)
-        workTimer?.schedule(workTime) {
-            // Lógica para quando o temporizador de trabalho terminar
-            println("Temporizador de trabalho encerrado")
-            pomodoroTimer.onWorkTimerFinished() // Chame o método na classe PomodoroTimer
-        }
-        return "Timer started with work time of ${timerConfigService.getWorkTime()} minutes"
+        val workTime = timerConfigService.getWorkTime()
+        pomodoroTimer.startTimer(workTime)
+        return "Timer started with work time of $workTime minutes"
     }
 
     @GetMapping("/pause")
     fun pauseTimer(): String {
-        // Lógica para pausar o temporizador Pomodoro
-        pomodoroTimer.pauseTimer()//pausa o cronometro
+        pomodoroTimer.pauseTimer()
         return "Timer paused"
     }
 
     @GetMapping("/stop")
     fun stopTimer(): String {
-        // Lógica para parar o temporizador Pomodoro
-        pomodoroTimer.pauseTimer()//pausa o cronometro
+        pomodoroTimer.pauseTimer()
         return "Timer stopped"
     }
+
     @PostMapping("/work-time/{minutes}")
     fun setWorkTime(@PathVariable minutes: Long): String {
         timerConfigService.setWorkTime(minutes)
@@ -46,7 +38,7 @@ class TimerController(private val timerConfigService: TimerConfigService,
 
     @PostMapping("/break-time/{minutes}")
     fun setBreakTime(@PathVariable minutes: Long): String {
-        timerConfigService.setBreakTime(minutes)
+        // Lógica para definir o tempo do breakTimer, se necessário
         return "Break time set to $minutes minutes"
     }
 }
